@@ -40,6 +40,10 @@ namespace ExchangeService
                         BinaryReader r = new BinaryReader(stream);
                         string message = r.ReadString();
                         logger.Info("Received Communicate: " + message);
+                        //Thread.Sleep(3000);
+                        string response = "Response from Service.";
+                        BinaryWriter w = new BinaryWriter(stream);
+                        w.Write(response);
                     }
                 }
                 tcpListener.Stop();

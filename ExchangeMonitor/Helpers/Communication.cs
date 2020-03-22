@@ -12,6 +12,8 @@ namespace ExchangeMonitor.Helpers
     {
         private Logger logger = LogManager.GetCurrentClassLogger();
         private BinaryWriter w = null;
+        private BinaryReader r = null;
+        private TcpClient client = null;
 
         public Communication()
         {
@@ -19,8 +21,8 @@ namespace ExchangeMonitor.Helpers
 
         public void SearchPort()
         {
-            TcpClient client = new TcpClient();
-
+            if(client==null)
+                client = new TcpClient();
             if(!client.Connected)
             {
                 try
@@ -28,11 +30,15 @@ namespace ExchangeMonitor.Helpers
                     int port = 25440;
                     client.Connect("Senti", port);
                     NetworkStream stream = client.GetStream();
-                    //stream.WriteTimeout = 4000;
+                    r = new BinaryReader(stream);
+                    stream.ReadTimeout = 2000;
                     w = new BinaryWriter(stream);
                     w.Write("Monitor przesyła wiadomość.");
+                    string response = r.ReadString();
+                    logger.Info("Odpowiedź: " + response);
                     stream.Close();
                     client.Close();
+                    client = null;
                 }
                 catch(Exception ex)
                 {
